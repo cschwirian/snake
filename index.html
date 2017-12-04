@@ -1,0 +1,133 @@
+<!-- TODO: Add variable speed. -->
+<!-- TODO: Add functionality for mobile device inputs. -->
+<!-- TODO: Encapsulte some javascript to main.js. -->
+
+<head>
+    <title>Snake</title>
+</head>
+<body>
+    <canvas style="margin: auto; display: block" id="window" width="400" height="400"></canvas>
+    <div id="buttons">
+
+    </div>
+    <script>
+        v = 1;
+        starting_tail_size = 5;
+
+        window.onload = function() {
+        	game_window = document.getElementById("window");
+        	game_context = game_window.getContext("2d");
+        	document.addEventListener("keydown", turn);
+        	setInterval(game, 1000 / 13);
+        }
+
+        x_position = 10;
+        y_position = 10;
+
+        grid_size = 20;
+        num_tiles = 20;
+
+        goal_x_position = 15;
+        goal_y_position = 15;
+
+        x_velocity = 0;
+        y_velocity = 0;
+
+        tail = [];
+        tail_size = starting_tail_size;
+
+        // Initializes a check to determine if the user is allowed
+        // to turn the snake. This prevents the user from losing by
+        // turning the snake in on itself.
+        check = false;
+
+        function game() {
+            score = tail_size - starting_tail_size;
+            console.log(score);
+
+            // Moves the snake forward by one.
+        	x_position += x_velocity;
+        	y_position += y_velocity;
+
+            // Allows the user to turn the snake.
+            check = false;
+
+        	if (x_position < 0) {
+        		x_position = num_tiles - 1;
+        	}
+        	if (x_position > num_tiles - 1) {
+        		x_position = 0;
+        	}
+        	if (y_position < 0) {
+        		y_position = num_tiles - 1;
+        	}
+        	if (y_position > num_tiles - 1) {
+        		y_position = 0;
+        	}
+
+        	game_context.fillStyle="black";
+        	game_context.fillRect(0, 0, game_window.width, game_window.height);
+
+        	game_context.fillStyle="lime";
+        	for (var i = 0; i < tail.length; i++) {
+        		game_context.fillRect(tail[i].x * grid_size, tail[i].y * grid_size, grid_size - 2, grid_size - 2);
+        		if (tail[i].x == x_position && tail[i].y == y_position) {
+        			tail_size = starting_tail_size;
+        		}
+        	}
+
+        	tail.push({x: x_position, y: y_position});
+        	while (tail.length > tail_size) {
+        	       tail.shift();
+        	}
+
+        	if (goal_x_position == x_position && goal_y_position == y_position) {
+        		tail_size++;
+        		goal_x_position = Math.floor(Math.random() * num_tiles);
+        		goal_y_position = Math.floor(Math.random() * num_tiles);
+        	}
+        	game_context.fillStyle="lime";
+        	game_context.fillRect(goal_x_position * grid_size, goal_y_position * grid_size, grid_size - 2, grid_size - 2);
+        }
+
+        function turn(evt) {
+            // The cases for this switch further check if the user
+            // is trying to go backwards and if the user is allowed
+            // turn the snake.
+        	switch(evt.keyCode) {
+                // Left
+        		case 37:
+                    if (x_velocity != v && !check) {
+            			x_velocity = -v;
+                        y_velocity = 0;
+                        check = true;
+                    }
+        			break;
+                // Up
+        		case 38:
+                    if (y_velocity != v && !check) {
+            			x_velocity = 0;
+                        y_velocity = -v;
+                        check = true;
+                    }
+        			break;
+                // Right
+        		case 39:
+                    if (x_velocity != -v && !check) {
+            			x_velocity = v;
+                        y_velocity = 0;
+                        check = true;
+                    }
+        			break;
+                // Down
+        		case 40:
+                    if (y_velocity != -v && !check) {
+            			x_velocity = 0;
+                        y_velocity = v;
+                        check = true;
+                    }
+        			break;
+        	}
+        }
+    </script>
+</body>
